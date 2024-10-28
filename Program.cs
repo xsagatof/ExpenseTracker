@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using SpendSmart.Models;
 using Microsoft.Extensions.DependencyInjection;
 using SpendSmart.Data;
+using SpendSmart.Models;
+using SpendSmart.Models.SpendSmart.Models;
 
 namespace SpendSmart
 {
@@ -21,6 +23,13 @@ namespace SpendSmart
 				);
 
 			var app = builder.Build();
+
+			using (var scope = app.Services.CreateScope())
+			{
+				var services = scope.ServiceProvider;
+
+				SeedData.Initialize(services);
+			}
 
 			// Configure the HTTP request pipeline.
 			if (!app.Environment.IsDevelopment())

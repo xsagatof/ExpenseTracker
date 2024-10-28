@@ -19,28 +19,58 @@ namespace SpendSmart.Controllers
             _context = context;
         }
 
-        // GET: Expenses
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Expense.ToListAsync());
-        }
+		// GET: Expenses
+		public async Task<IActionResult> Index(string expenseDescription,string searchString)
+		{
+			if (_context.Expense == null)
+			{
+				return Problem("Entity set 'SpendSmartDbContext.Expenses'  is null.");
+			}
 
-        // GET: Expenses/Details/5
-        public async Task<IActionResult> Details(int? id)
+            IQueryable<string> descriptionQuery = from m in _context.Expense
+                                            orderby m.Description
+                                            select m.Description;
+
+            var expenses = from m in _context.Expense
+				select m;
+
+			if (!String.IsNullOrEmpty(searchString))
+			{
+				expenses = expenses.Where(s => s.Description!.ToUpper().Contains(searchString.ToUpper()));
+			}
+
+			if (!string.IsNullOrEmpty(expenseDescription))
+			{
+				expenses = expenses.Where(x => x.Description == expenseDescription);
+			}
+
+			var doubleVM = new DoubleViewModel()
+			{
+				Descriptions = new SelectList(await descriptionQuery.Distinct().ToListAsync()),
+				Expenses = await expenses.ToListAsync()
+			};
+
+			return View(doubleVM);
+
+
+		}
+
+		// GET: Expenses/Details/5
+		public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var expense = await _context.Expense
+            var doubleVM = await _context.Expense
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (expense == null)
+            if (doubleVM == null)
             {
                 return NotFound();
             }
 
-            return View(expense);
+            return View(doubleVM);
         }
 
         // GET: Expenses/Create

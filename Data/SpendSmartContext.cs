@@ -9,7 +9,7 @@ namespace SpendSmart.Data
 {
     public class SpendSmartContext : DbContext
     {
-        public SpendSmartContext (DbContextOptions<SpendSmartContext> options)
+        public SpendSmartContext(DbContextOptions<SpendSmartContext> options)
             : base(options)
         {
         }
